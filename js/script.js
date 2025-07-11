@@ -46,20 +46,12 @@ $(document).ready(function () {
     responsive: {
       0: { items: 1 },
       768: { items: 2 },
-      992: { items: 2 } // 2 items per row
+      992: { items: 2 }
     }
   });
 
  
 });
-
-
-
-
-
-
-
-
 
 
 document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
@@ -72,31 +64,55 @@ document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
 
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("contactForm");
+  const statusBox = document.getElementById("formStatus");
+  const sendBtn = document.getElementById("send-btn");
 
   form.addEventListener("submit", function (e) {
-    e.preventDefault(); // Stop default submit
+    e.preventDefault();
 
-    const isValid = validateForm();
+    if (!validateForm()) return;
 
-    if (isValid) {
-      fetch("https://formsubmit.co/abanoubwagim@gmail.com", {
-        method: "POST",
-        body: new FormData(form),
+    
+    sendBtn.disabled = true;
+    statusBox.innerHTML = '<div class="form-loader mx-auto"></div>';
+
+    fetch("https://formsubmit.co/abanoubwagim@gmail.com", {
+      method: "POST",
+      headers: {
+        Accept: "application/json"
+      },
+      body: new FormData(form),
+    })
+      .then((response) => {
+        if (response.ok) {
+          statusBox.innerHTML = `
+            <div class="form-snackbar success text-center">
+              ✅ Thank you! Your message has been sent successfully.
+            </div>`;
+          form.reset();
+        } else {
+          statusBox.innerHTML = `
+            <div class="form-snackbar error text-center">
+              ❌ Something went wrong. Please try again.
+            </div>`;
+        }
       })
-        .then((response) => {
-          if (response.ok) {
-            form.innerHTML = `
-              <div class="alert alert-success text-center">
-                ✅ Thank you! Your message has been sent successfully.
-              </div>`;
-          } else {
-            alert("❌ Something went wrong. Please try again.");
-          }
-        })
-        .catch(() => alert("❌ Network error. Please try again."));
-    }
+      .catch(() => {
+        statusBox.innerHTML = `
+          <div class="form-snackbar error text-center">
+            ❌ Network error. Please check your connection.
+          </div>`;
+      })
+      .finally(() => {
+        sendBtn.disabled = false;
+        setTimeout(() => {
+          statusBox.innerHTML = "";
+        }, 5000);
+      });
   });
 });
+
+
 
 function setRequiredError(errorId) {
   const el = document.getElementById(errorId);
