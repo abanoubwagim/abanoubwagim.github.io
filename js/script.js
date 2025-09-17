@@ -1,65 +1,48 @@
-$(document).ready(function () {
-  $(".owl-services").owlCarousel({
-    loop: true,
-    margin: 20,
-    nav: false,
-    dots: false,
-    autoplay: true,
-    autoplayTimeout: 2000,
-    responsive: {
-      0: { items: 1 },
-      768: { items: 1 },
-      992: { items: 3 }
-    }
-  });
-});
+const categories = document.querySelectorAll('.pill-ca');
+const skills = document.querySelectorAll('#skills-container .pill');
 
+categories.forEach(category => {
+    category.addEventListener('click', () => {
+        categories.forEach(c => c.classList.remove('active'));
+        category.classList.add('active');
 
-$(document).ready(function () {
-  $(".project-carousel-fr").owlCarousel({
-    rtl: true,
-    loop: true,
-    margin: 30,
-    nav: false,
-    dots: false,
-    autoplay: true,
-    autoplayTimeout: 3000,
-    responsive: {
-      0: { items: 1 },
-      768: { items: 1 },
-      992: { items: 2 }
-    }
-  });
+        const filter = category.getAttribute('data-filter');
+
+        skills.forEach(skill => {
+            if (filter === 'all' || skill.getAttribute('data-category') === filter) {
+                skill.style.display = 'inline-block';
+            } else {
+                skill.style.display = 'none';
+            }
+        });
+    });
 });
 
 
 
 $(document).ready(function () {
-  $(".project-carousel-sc").owlCarousel({
-    rtl: false, 
-    loop: true,
-    margin: 30,
-    nav: false,
-    dots: false,
-    autoplay: true,
-    autoplayTimeout: 3000,
-    responsive: {
-      0: { items: 1 },
-      768: { items: 2 },
-      992: { items: 2 }
-    }
-  });
-
- 
+    $(".owl-carousel").owlCarousel({
+        loop: true,
+        margin: 20,
+        nav: true,
+        dots: false,
+        navText: [
+            '<i class="fa-solid fa-chevron-left"></i>',
+            '<i class="fa-solid fa-chevron-right"></i>'
+        ],
+        responsive: {
+            0: { items: 1 },
+            992: { items: 2 },
+            1200: { items: 3 }
+        }
+    });
 });
 
 
-document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
-  link.addEventListener('click', function () {
-    document.querySelectorAll('.navbar-nav .nav-link').forEach(l => l.classList.remove('active'));
-    this.classList.add('active');
-  });
-});
+
+
+
+
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -72,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!validateForm()) return;
 
-    
+    // Show loader
     sendBtn.disabled = true;
     statusBox.innerHTML = '<div class="form-loader mx-auto"></div>';
 
@@ -86,13 +69,13 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => {
         if (response.ok) {
           statusBox.innerHTML = `
-            <div class="form-snackbar success text-center">
+            <div class="form-snackbar success text-center p-2" style="background-color: #112131; color: white;">
               ✅ Thank you! Your message has been sent successfully.
             </div>`;
           form.reset();
         } else {
           statusBox.innerHTML = `
-            <div class="form-snackbar error text-center">
+            <div class="form-snackbar error text-center p-2" style="background-color: #112131; color: white;">
               ❌ Something went wrong. Please try again.
             </div>`;
         }
@@ -105,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .finally(() => {
         sendBtn.disabled = false;
+        // Hide message after 5 seconds
         setTimeout(() => {
           statusBox.innerHTML = "";
         }, 5000);
@@ -120,43 +104,69 @@ function setRequiredError(errorId) {
 }
 
 function validateForm() {
-  const name = document.getElementById("nameInput").value.trim();
-  const email = document.getElementById("emailInput").value.trim();
-  const message = document.getElementById("messageTextarea").value.trim();
+    const name = document.getElementById("nameInput");
+    const email = document.getElementById("emailInput");
+    const subject = document.getElementById("subjectInput");
+    const message = document.getElementById("messageTextarea");
 
-  const nameError = document.getElementById("nameError");
-  const emailError = document.getElementById("emailError");
-  const messageError = document.getElementById("messageError");
+    const nameError = document.getElementById("nameError");
+    const emailError = document.getElementById("emailError");
+    const subjectError = document.getElementById("subjectError");
+    const messageError = document.getElementById("messageError");
 
- 
-  nameError.textContent = "";
-  emailError.textContent = "";
-  messageError.textContent = "";
+    // Clear previous errors
+    [name, email, subject, message].forEach(input => {
+        input.classList.remove("error", "success");
+    });
+    [nameError, emailError, subjectError, messageError].forEach(el => el.textContent = "");
 
-  let isValid = true;
+    let isValid = true;
 
-  if (name === "") {
-    setRequiredError("nameError");
-    isValid = false;
-  } else if (name.length < 4) {
-    nameError.textContent = "Name must be at least 4 characters.";
-    isValid = false;
-  }
+    if (name.value.trim() === "") {
+        setRequiredError("nameError");
+        name.classList.add("error");
+        isValid = false;
+    } else if (name.value.trim().length < 4) {
+        nameError.textContent = "Name must be at least 4 characters.";
+        name.classList.add("error");
+        isValid = false;
+    } else {
+        name.classList.add("success");
+    }
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (email === "") {
-    setRequiredError("emailError");
-    isValid = false;
-  } else if (!emailPattern.test(email)) {
-    emailError.textContent = "Please enter a valid email address.";
-    isValid = false;
-  }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email.value.trim() === "") {
+        setRequiredError("emailError");
+        email.classList.add("error");
+        isValid = false;
+    } else if (!emailPattern.test(email.value.trim())) {
+        emailError.textContent = "Please enter a valid email address.";
+        email.classList.add("error");
+        isValid = false;
+    } else {
+        email.classList.add("success");
+    }
 
-  if (message === "") {
-    setRequiredError("messageError");
-    isValid = false;
-  }
+    if (subject.value.trim() === "") {
+        setRequiredError("subjectError");
+        subject.classList.add("error");
+        isValid = false;
+    } else {
+        subject.classList.add("success");
+    }
 
-  return isValid;
+    if (message.value.trim() === "") {
+        setRequiredError("messageError");
+        message.classList.add("error");
+        isValid = false;
+    } else if (message.value.trim().length < 10) {
+        messageError.textContent = "Message must be at least 10 characters.";
+        message.classList.add("error");
+        isValid = false;
+    } else {
+        message.classList.add("success");
+    }
+
+    return isValid;
 }
 
