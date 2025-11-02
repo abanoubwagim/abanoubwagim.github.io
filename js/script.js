@@ -1,172 +1,432 @@
-const categories = document.querySelectorAll('.pill-ca');
-const skills = document.querySelectorAll('#skills-container .pill');
+const texts = ['Java Full-Stack Developer', 'Backend Engineer', 'Problem Solver', 'API Developer'];
+let textIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+const typingElement = document.getElementById('typingText');
 
-categories.forEach(category => {
-    category.addEventListener('click', () => {
-        categories.forEach(c => c.classList.remove('active'));
-        category.classList.add('active');
+function type() {
+  const currentText = texts[textIndex];
 
-        const filter = category.getAttribute('data-filter');
+  if (isDeleting) {
+    typingElement.textContent = currentText.substring(0, charIndex - 1);
+    charIndex--;
+  } else {
+    typingElement.textContent = currentText.substring(0, charIndex + 1);
+    charIndex++;
+  }
 
-        skills.forEach(skill => {
-            if (filter === 'all' || skill.getAttribute('data-category') === filter) {
-                skill.style.display = 'inline-block';
-            } else {
-                skill.style.display = 'none';
-            }
-        });
-    });
+  if (!isDeleting && charIndex === currentText.length) {
+    setTimeout(() => isDeleting = true, 2000);
+  } else if (isDeleting && charIndex === 0) {
+    isDeleting = false;
+    textIndex = (textIndex + 1) % texts.length;
+  }
+
+  const typingSpeed = isDeleting ? 50 : 100;
+  setTimeout(type, typingSpeed);
+}
+
+setTimeout(type, 1000);
+
+function createParticles() {
+  const particleCount = 30;
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.animationDuration = (Math.random() * 10 + 5) + 's';
+    particle.style.animationDelay = Math.random() * 5 + 's';
+
+    const keyframes = `
+                    @keyframes float${i} {
+                        0%, 100% { transform: translate(0, 0); }
+                        25% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px); }
+                        50% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px); }
+                        75% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px); }
+                    }
+                `;
+
+    const style = document.createElement('style');
+    style.textContent = keyframes;
+    document.head.appendChild(style);
+
+    particle.style.animation = `float${i} ${Math.random() * 15 + 10}s infinite`;
+    document.body.appendChild(particle);
+  }
+}
+
+createParticles();
+
+function reveal() {
+  const reveals = document.querySelectorAll('.reveal');
+
+  reveals.forEach(element => {
+    const windowHeight = window.innerHeight;
+    const elementTop = element.getBoundingClientRect().top;
+    const elementVisible = 150;
+
+    if (elementTop < windowHeight - elementVisible) {
+      element.classList.add('active');
+    }
+  });
+}
+
+window.addEventListener('scroll', reveal);
+reveal();
+
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 50) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
 });
 
-
-
-$(document).ready(function () {
-    $(".owl-carousel").owlCarousel({
-        loop: true,
-        margin: 20,
-        nav: true,
-        dots: false,
-        navText: [
-            '<i class="fa-solid fa-chevron-left"></i>',
-            '<i class="fa-solid fa-chevron-right"></i>'
-        ],
-        responsive: {
-            0: { items: 1 },
-            992: { items: 2 },
-            1200: { items: 3 }
-        }
-    });
-});
-
-
-
-
-
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("contactForm");
-  const statusBox = document.getElementById("formStatus");
-  const sendBtn = document.getElementById("send-btn");
-
-  form.addEventListener("submit", function (e) {
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
     e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    if (!validateForm()) return;
-
-    // Show loader
-    sendBtn.disabled = true;
-    statusBox.innerHTML = '<div class="form-loader mx-auto"></div>';
-
-    fetch("https://formsubmit.co/abanoubwagim@gmail.com", {
-      method: "POST",
-      headers: {
-        Accept: "application/json"
-      },
-      body: new FormData(form),
-    })
-      .then((response) => {
-        if (response.ok) {
-          statusBox.innerHTML = `
-            <div class="form-snackbar success text-center p-2" style="background-color: #112131; color: white;">
-              ✅ Thank you! Your message has been sent successfully.
-            </div>`;
-          form.reset();
-        } else {
-          statusBox.innerHTML = `
-            <div class="form-snackbar error text-center p-2" style="background-color: #112131; color: white;">
-              ❌ Something went wrong. Please try again.
-            </div>`;
-        }
-      })
-      .catch(() => {
-        statusBox.innerHTML = `
-          <div class="form-snackbar error text-center">
-            ❌ Network error. Please check your connection.
-          </div>`;
-      })
-      .finally(() => {
-        sendBtn.disabled = false;
-        // Hide message after 5 seconds
-        setTimeout(() => {
-          statusBox.innerHTML = "";
-        }, 5000);
-      });
+      const navbarCollapse = document.getElementById('navbarNav');
+      if (navbarCollapse.classList.contains('show')) {
+        navbarCollapse.classList.remove('show');
+      }
+    }
   });
 });
 
+const contactForm = document.getElementById('contactForm');
+const formStatus = document.getElementById('formStatus');
 
-
-function setRequiredError(errorId) {
-  const el = document.getElementById(errorId);
-  if (el) el.textContent = "The field is required.";
+function setError(inputId, errorId, message) {
+  const input = document.getElementById(inputId);
+  const error = document.getElementById(errorId);
+  input.classList.add('error');
+  input.classList.remove('success');
+  error.textContent = message;
 }
 
-function validateForm() {
-    const name = document.getElementById("nameInput");
-    const email = document.getElementById("emailInput");
-    const subject = document.getElementById("subjectInput");
-    const message = document.getElementById("messageTextarea");
+function setSuccess(inputId, errorId) {
+  const input = document.getElementById(inputId);
+  const error = document.getElementById(errorId);
+  input.classList.add('success');
+  input.classList.remove('error');
+  error.textContent = '';
+}
 
-    const nameError = document.getElementById("nameError");
-    const emailError = document.getElementById("emailError");
-    const subjectError = document.getElementById("subjectError");
-    const messageError = document.getElementById("messageError");
+function clearValidation() {
+  ['nameInput', 'emailInput', 'subjectInput', 'messageInput'].forEach(id => {
+    const input = document.getElementById(id);
+    input.classList.remove('error', 'success');
+  });
+  ['nameError', 'emailError', 'subjectError', 'messageError'].forEach(id => {
+    document.getElementById(id).textContent = '';
+  });
+}
 
-    // Clear previous errors
-    [name, email, subject, message].forEach(input => {
-        input.classList.remove("error", "success");
+contactForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  clearValidation();
+
+  const name = document.getElementById('nameInput').value.trim();
+  const email = document.getElementById('emailInput').value.trim();
+  const subject = document.getElementById('subjectInput').value.trim();
+  const message = document.getElementById('messageInput').value.trim();
+
+  let isValid = true;
+
+  if (name === '') {
+    setError('nameInput', 'nameError', 'Please write here your name');
+    isValid = false;
+  } else if (name.length < 3) {
+    setError('nameInput', 'nameError', 'Name must be at least 3 characters');
+    isValid = false;
+  } else {
+    setSuccess('nameInput', 'nameError');
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (email === '') {
+    setError('emailInput', 'emailError', 'Please write here your email');
+    isValid = false;
+  } else if (!emailRegex.test(email)) {
+    setError('emailInput', 'emailError', 'Please enter a valid email address');
+    isValid = false;
+  } else {
+    setSuccess('emailInput', 'emailError');
+  }
+
+  if (subject === '') {
+    setError('subjectInput', 'subjectError', 'Please write here your subject');
+    isValid = false;
+  } else if (subject.length < 3) {
+    setError('subjectInput', 'subjectError', 'Subject must be at least 3 characters');
+    isValid = false;
+  } else {
+    setSuccess('subjectInput', 'subjectError');
+  }
+
+  if (message === '') {
+    setError('messageInput', 'messageError', 'Please write here your message');
+    isValid = false;
+  } else if (message.length < 10) {
+    setError('messageInput', 'messageError', 'Message must be at least 10 characters');
+    isValid = false;
+  } else {
+    setSuccess('messageInput', 'messageError');
+  }
+
+  if (!isValid) return;
+
+  formStatus.innerHTML = '<div class="loader"></div>';
+
+  // Submit form to FormSubmit
+  try {
+    const response = await fetch('https://formsubmit.co/abanoubwagim@gmail.com', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json'
+      },
+      body: new FormData(contactForm)
     });
-    [nameError, emailError, subjectError, messageError].forEach(el => el.textContent = "");
 
-    let isValid = true;
-
-    if (name.value.trim() === "") {
-        setRequiredError("nameError");
-        name.classList.add("error");
-        isValid = false;
-    } else if (name.value.trim().length < 4) {
-        nameError.textContent = "Name must be at least 4 characters.";
-        name.classList.add("error");
-        isValid = false;
+    if (response.ok) {
+      formStatus.innerHTML = `
+                        <div class="alert-custom" style="background: rgba(0, 119, 182, 0.2); border: 1px solid #0077B6; color: #D7E6F3;">
+                            <i class="fa-solid fa-check-circle me-2"></i>
+                            Message sent successfully! I'll get back to you soon.
+                        </div>
+                    `;
+      contactForm.reset();
+      clearValidation();
     } else {
-        name.classList.add("success");
+      formStatus.innerHTML = `
+                        <div class="alert-custom" style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #D7E6F3;">
+                            <i class="fa-solid fa-exclamation-circle me-2"></i>
+                            Something went wrong. Please try again.
+                        </div>
+                    `;
     }
+  } catch (error) {
+    formStatus.innerHTML = `
+                    <div class="alert-custom" style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #D7E6F3;">
+                        <i class="fa-solid fa-exclamation-circle me-2"></i>
+                        Network error. Please check your connection.
+                    </div>
+                `;
+  }
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (email.value.trim() === "") {
-        setRequiredError("emailError");
-        email.classList.add("error");
-        isValid = false;
-    } else if (!emailPattern.test(email.value.trim())) {
-        emailError.textContent = "Please enter a valid email address.";
-        email.classList.add("error");
-        isValid = false;
-    } else {
-        email.classList.add("success");
-    }
+  setTimeout(() => {
+    formStatus.innerHTML = '';
+  }, 5000);
+});
 
-    if (subject.value.trim() === "") {
-        setRequiredError("subjectError");
-        subject.classList.add("error");
-        isValid = false;
-    } else {
-        subject.classList.add("success");
-    }
+const track = document.getElementById('projectsTrack');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const dotsContainer = document.getElementById('carouselDots');
+const currentSlideSpan = document.getElementById('currentSlide');
+const totalSlidesSpan = document.getElementById('totalSlides');
 
-    if (message.value.trim() === "") {
-        setRequiredError("messageError");
-        message.classList.add("error");
-        isValid = false;
-    } else if (message.value.trim().length < 10) {
-        messageError.textContent = "Message must be at least 10 characters.";
-        message.classList.add("error");
-        isValid = false;
-    } else {
-        message.classList.add("success");
-    }
+let currentIndex = 0;
+let allSlides = Array.from(document.querySelectorAll('.project-slide'));
+let activeFilter = 'all';
 
-    return isValid;
+function getSlidesPerView() {
+  const width = window.innerWidth;
+  if (width >= 992) return 3;
+  if (width >= 768) return 2;
+  return 1;
 }
 
+
+
+function getVisibleSlides() {
+  if (activeFilter === 'all') {
+    return allSlides;
+  }
+  return allSlides.filter(slide => slide.dataset.category === activeFilter);
+}
+function rebuildTrack() {
+  const visibleSlides = getVisibleSlides();
+
+  track.innerHTML = '';
+
+  visibleSlides.forEach(slide => {
+    track.appendChild(slide.cloneNode(true));
+  });
+}
+
+function updateCarousel() {
+  const visibleSlides = getVisibleSlides();
+  const slidesPerView = getSlidesPerView();
+
+  const slide = track.querySelector('.project-slide');
+  const slideWidth = slide.offsetWidth;
+  const gap = parseFloat(getComputedStyle(track).gap) || 0;
+  const moveX = currentIndex * (slideWidth + gap) * slidesPerView;
+
+  track.style.transform = `translateX(-${moveX}px)`;
+  track.style.transition = 'transform 0.6s ease';
+
+  const totalPages = Math.ceil(visibleSlides.length / slidesPerView);
+  const maxIndex = totalPages - 1;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex >= maxIndex;
+
+  updateDots();
+  currentSlideSpan.textContent = currentIndex + 1;
+  totalSlidesSpan.textContent = totalPages;
+}
+
+
+function createDots() {
+  const visibleSlides = getVisibleSlides();
+  const slidesPerView = getSlidesPerView();
+  dotsContainer.innerHTML = '';
+  const totalPages = Math.ceil(visibleSlides.length / slidesPerView);
+
+  for (let i = 0; i < totalPages; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    if (i === currentIndex) dot.classList.add('active');
+    dot.addEventListener('click', () => {
+      currentIndex = i;
+      updateCarousel();
+    });
+    dotsContainer.appendChild(dot);
+  }
+}
+
+function updateDots() {
+  const dots = dotsContainer.querySelectorAll('.dot');
+  dots.forEach((dot, index) => {
+    dot.classList.toggle('active', index === currentIndex);
+  });
+}
+
+prevBtn.addEventListener('click', () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    updateCarousel();
+  }
+});
+
+nextBtn.addEventListener('click', () => {
+  const visibleSlides = getVisibleSlides();
+  const slidesPerView = getSlidesPerView();
+  const totalPages = Math.ceil(visibleSlides.length / slidesPerView);
+  const maxIndex = totalPages - 1;
+  if (currentIndex < maxIndex) {
+    currentIndex++;
+    updateCarousel();
+  }
+});
+
+const filterBtns = document.querySelectorAll('.filter-btn');
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    activeFilter = btn.dataset.filter;
+    currentIndex = 0;
+
+    rebuildTrack();
+
+    track.style.transform = 'translateX(0)';
+
+    createDots();
+    updateCarousel();
+  });
+});
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const visibleSlides = getVisibleSlides();
+    const slidesPerView = getSlidesPerView();
+    const totalPages = Math.ceil(visibleSlides.length / slidesPerView);
+    const maxIndex = totalPages - 1;
+
+    if (currentIndex > maxIndex) {
+      currentIndex = maxIndex;
+    }
+
+    createDots();
+    updateCarousel();
+  }, 150);
+});
+
+document.addEventListener('keydown', (e) => {
+  const visibleSlides = getVisibleSlides();
+  const slidesPerView = getSlidesPerView();
+  const totalPages = Math.ceil(visibleSlides.length / slidesPerView);
+  const maxIndex = totalPages - 1;
+
+  if (e.key === 'ArrowLeft' && currentIndex > 0) {
+    currentIndex--;
+    updateCarousel();
+  } else if (e.key === 'ArrowRight' && currentIndex < maxIndex) {
+    currentIndex++;
+    updateCarousel();
+  }
+});
+
+let touchStartX = 0;
+let touchEndX = 0;
+let isDragging = false;
+
+track.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+  isDragging = true;
+}, { passive: true });
+
+track.addEventListener('touchmove', (e) => {
+  if (!isDragging) return;
+  touchEndX = e.touches[0].clientX;
+}, { passive: true });
+
+track.addEventListener('touchend', () => {
+  if (!isDragging) return;
+  isDragging = false;
+
+  const diff = touchStartX - touchEndX;
+  const swipeThreshold = 75;
+
+  if (Math.abs(diff) > swipeThreshold) {
+    const visibleSlides = getVisibleSlides();
+    const slidesPerView = getSlidesPerView();
+    const totalPages = Math.ceil(visibleSlides.length / slidesPerView);
+    const maxIndex = totalPages - 1;
+
+    if (diff > 0 && currentIndex < maxIndex) {
+      currentIndex++;
+      updateCarousel();
+    } else if (diff < 0 && currentIndex > 0) {
+      currentIndex--;
+      updateCarousel();
+    }
+  }
+
+  touchStartX = 0;
+  touchEndX = 0;
+});
+
+function init() {
+  createDots();
+  updateCarousel();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  setTimeout(init, 100);
+}
