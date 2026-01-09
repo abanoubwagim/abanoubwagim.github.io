@@ -1,4 +1,4 @@
-# 👨‍💻 Abanoub Wagim — Java Full Stack Developer Portfolio
+# 👨‍💻 Abanoub Wagim — Java Backend Developer Portfolio
 
 <div align="center">
 
@@ -158,7 +158,7 @@ I'm always interested in connecting with fellow developers, potential collaborat
 
 <div align="center">
 
-### 💼 Looking for a Java Full Stack Developer?
+### 💼 Looking for a Java Backend Developer?
 
 I'm passionate about building secure, scalable applications with clean code.
 
@@ -168,10 +168,6 @@ I'm passionate about building secure, scalable applications with clean code.
 
 Made with ❤️ and ☕ by **Abanoub Wagim**
 
-© 2025 Abanoub Wagim. All rights reserved.
-
----
-
-⭐ **If you find this portfolio inspiring, please consider giving it a star!**
+© 2026 Abanoub Wagim. All rights reserved.
 
 </div>
