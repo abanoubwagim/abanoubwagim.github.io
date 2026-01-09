@@ -1,33 +1,3 @@
-const texts = ['Java Full-Stack Developer', 'Backend Engineer', 'Problem Solver', 'API Developer'];
-let textIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
-const typingElement = document.getElementById('typingText');
-
-function type() {
-  const currentText = texts[textIndex];
-
-  if (isDeleting) {
-    typingElement.textContent = currentText.substring(0, charIndex - 1);
-    charIndex--;
-  } else {
-    typingElement.textContent = currentText.substring(0, charIndex + 1);
-    charIndex++;
-  }
-
-  if (!isDeleting && charIndex === currentText.length) {
-    setTimeout(() => isDeleting = true, 2000);
-  } else if (isDeleting && charIndex === 0) {
-    isDeleting = false;
-    textIndex = (textIndex + 1) % texts.length;
-  }
-
-  const typingSpeed = isDeleting ? 50 : 100;
-  setTimeout(type, typingSpeed);
-}
-
-setTimeout(type, 1000);
-
 function createParticles() {
   const particleCount = 30;
   for (let i = 0; i < particleCount; i++) {
@@ -39,13 +9,13 @@ function createParticles() {
     particle.style.animationDelay = Math.random() * 5 + 's';
 
     const keyframes = `
-                    @keyframes float${i} {
-                        0%, 100% { transform: translate(0, 0); }
-                        25% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px); }
-                        50% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px); }
-                        75% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px); }
-                    }
-                `;
+      @keyframes float${i} {
+       0%, 100% { transform: translate(0, 0); }
+       25% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px); }
+       50% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px); }
+       75% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px); }
+       }
+        `;              
 
     const style = document.createElement('style');
     style.textContent = keyframes;
@@ -197,28 +167,28 @@ contactForm.addEventListener('submit', async (e) => {
 
     if (response.ok) {
       formStatus.innerHTML = `
-                        <div class="alert-custom" style="background: rgba(0, 119, 182, 0.2); border: 1px solid #0077B6; color: #D7E6F3;">
-                            <i class="fa-solid fa-check-circle me-2"></i>
-                            Message sent successfully! I'll get back to you soon.
-                        </div>
-                    `;
+     <div class="alert-custom" style="background: rgba(0, 119, 182, 0.2); border: 1px solid #0077B6; color: #D7E6F3;">
+      <i class="fa-solid fa-check-circle me-2"></i>
+      Message sent successfully! I'll get back to you soon.
+      </div>
+      `;
       contactForm.reset();
       clearValidation();
     } else {
       formStatus.innerHTML = `
-                        <div class="alert-custom" style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #D7E6F3;">
-                            <i class="fa-solid fa-exclamation-circle me-2"></i>
-                            Something went wrong. Please try again.
-                        </div>
-                    `;
+     <div class="alert-custom" style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #D7E6F3;">
+     <i class="fa-solid fa-exclamation-circle me-2"></i>
+     Something went wrong. Please try again.
+     </div>
+     `;
     }
   } catch (error) {
     formStatus.innerHTML = `
-                    <div class="alert-custom" style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #D7E6F3;">
-                        <i class="fa-solid fa-exclamation-circle me-2"></i>
-                        Network error. Please check your connection.
-                    </div>
-                `;
+     <div class="alert-custom" style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #D7E6F3;">
+     <i class="fa-solid fa-exclamation-circle me-2"></i>
+     Network error. Please check your connection.
+     </div>
+      `;
   }
 
   setTimeout(() => {
@@ -330,6 +300,8 @@ nextBtn.addEventListener('click', () => {
 });
 
 const filterBtns = document.querySelectorAll('.filter-btn');
+const filterInfoMessage = document.getElementById('filterInfoMessage');
+
 filterBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     filterBtns.forEach(b => b.classList.remove('active'));
@@ -337,6 +309,12 @@ filterBtns.forEach(btn => {
 
     activeFilter = btn.dataset.filter;
     currentIndex = 0;
+
+    if (activeFilter === 'frontend') {
+      filterInfoMessage.style.display = 'flex';
+    } else {
+      filterInfoMessage.style.display = 'none';
+    }
 
     rebuildTrack();
 
@@ -430,3 +408,4 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(init, 100);
 }
+document.getElementById('currentYear').textContent = new Date().getFullYear();
